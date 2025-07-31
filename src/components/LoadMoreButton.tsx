@@ -1,11 +1,12 @@
 import { Button } from "@mui/material"
 import { useDispatch  } from "react-redux";
-import { loadMorePokemons  } from "../store";
+import { loadMorePokemons, clearCache  } from "../store";
 
 export const LoadMoreButton = () => {
     const dispatch = useDispatch();
     
     const handleLoadMore = () => {
+        dispatch(clearCache());
         dispatch(loadMorePokemons());
     }
   return (
