@@ -1,16 +1,16 @@
+import { Box, Card, CardContent, CardHeader, CardMedia, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Card, CardHeader, CardMedia, CardContent, Typography, CardActions, IconButton } from '@mui/material';
 import { pokemonApi } from '../api';
 
 import { pokemonTypes } from '../data/type-color';
 
 import { Star, StarOutline } from '@mui/icons-material';
-import { toggleFavorite, selectIsFavorite } from '../store';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../store';
+import { selectIsFavorite, toggleFavorite } from '../store';
 
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 interface PokemonData {
     name: string;
@@ -34,6 +34,13 @@ interface PokemonDetails {
     types: Array<{
         type: {
             name: string;
+            sprites?: {
+                "generation-vii"?: {
+                    "legends-arceus"?: {
+                        "name_icon"?: string;
+                    };
+                };
+            };
         };
     }>;
     height: number;
@@ -72,6 +79,10 @@ export const PokeCard = ({ pokemon }: PokeCardProps) => {
 
         fetchPokemonDetails();
     }, [pokemon.url]);
+
+    const getTypeIcon = (typeName: string): string => {
+        return `/icons/${typeName}.svg`;
+    };
 
     if (loading) {
         return (
@@ -202,27 +213,44 @@ export const PokeCard = ({ pokemon }: PokeCardProps) => {
                 />
             </IconButton>
 
-            <CardContent sx={{ textAlign: 'center', pt: 1, flex: 1 }}>
-                <div>
+            <CardContent sx={{ textAlign: 'center', pt: 1, flex: 1}}>
+                    <Box >
                     {pokemonDetails.types.map((type, index) => (
-                        <Typography 
+                        <Box
                             key={index}
-                            variant="caption" 
                             sx={{ 
                                 backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-                                padding: '2px 8px', 
+                                padding: '4px 8px', 
                                 borderRadius: '12px', 
                                 margin: '2px',
-                                display: 'inline-block',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
                                 textTransform: 'capitalize',
                                 color: 'white',
                                 backdropFilter: 'blur(10px)',
-                                border: '1px solid rgba(255, 255, 255, 0.3)'
+                                border: '1px solid rgba(255, 255, 255, 0.3)',
+                                minWidth: '60px'
                             }}
                         >
-                            {type.type.name}
-                        </Typography>
+                            <img 
+                                src={getTypeIcon(type.type.name)}
+                                alt={type.type.name}
+                                style={{ 
+                                    width: '16px', 
+                                    height: '16px',
+                                    marginRight: '4px'
+                                }}
+                                onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                            />
+                            <Typography variant="caption" sx={{ fontSize: '12px' }}>
+                                {type.type.name}
+                            </Typography>
+                        </Box>
                     ))}
+                    <Box sx={{ mt: 1}}>
                     {pokemonDetails.height && (
                         <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
                             Height: {pokemonDetails.height / 10} m
@@ -234,13 +262,22 @@ export const PokeCard = ({ pokemon }: PokeCardProps) => {
                             Weight: {pokemonDetails.weight / 10} kg
                         </Typography>
                     )}
-                </div>
+                    </Box>
+                </Box>
             </CardContent>
-            <CardActions sx={{ justifyContent: 'end', paddingRight: 2, paddingBottom: 2 }}>
+            <Box sx={{
+                position: 'absolute',
+                top: 12,
+                right: 16,
+                zIndex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}>
                 <a onClick={() => dispatch(toggleFavorite(pokemon.name))} style={{ cursor: 'pointer'}}>
                     {isFavorite ? <Star sx={{ color: 'gold' }}/> : <StarOutline sx={{ color: 'white' }} />}
                 </a>
-            </CardActions>
+            </Box>
         </Card>
     );
 }

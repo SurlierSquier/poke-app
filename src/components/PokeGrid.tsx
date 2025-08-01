@@ -1,32 +1,29 @@
+import { Box, Grid, Typography } from "@mui/material";
 import { useEffect } from 'react';
-import { Grid, Typography, CircularProgress, Box } from "@mui/material";
 import { useDispatch, useSelector } from 'react-redux';
-import { PokeCard } from "./PokeCard";
-import { 
-    getPokemon, 
-    getPokemonByTypes,
-    selectCurrentPagePokemons, 
-    selectAllCachedPokemons,
-    selectCurrentPage, 
-    selectLoading,
-    selectPokemonTypes,
-    selectShowFavorite,
-    selectFavorites,
-    selectCurrentLimit
-} from '../store';
 import type { AppDispatch } from '../store';
+import {
+    getPokemon,
+    getPokemonByTypes,
+    selectAllPokemons,
+    selectFavorites,
+    selectLoading,
+    selectLoadingMore,
+    selectPokemonTypes,
+    selectShowFavorite
+} from '../store';
 import { LoadMoreButton } from './LoadMoreButton';
-import { NextPageButton } from './NextPageButton';
-import { PreviousPageButton } from './PreviousPageButton';
+import { PokeCard } from "./PokeCard";
+import { SkeletonCard } from "./SkeletonCard";
+// import { NextPageButton } from './NextPageButton';
+// import { PreviousPageButton } from './PreviousPageButton';
 
 
 export const PokeGrid = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const pokemonList = useSelector(selectCurrentPagePokemons);
-    const allCachedPokemons = useSelector(selectAllCachedPokemons);
-    const currentPage = useSelector(selectCurrentPage);
-    const currentLimit = useSelector(selectCurrentLimit);
+    const allPokemons = useSelector(selectAllPokemons);
     const loading = useSelector(selectLoading);
+    const loadingMore = useSelector(selectLoadingMore);
     const selectedTypes = useSelector(selectPokemonTypes);
     const showFavorite = useSelector(selectShowFavorite);
     const favorites = useSelector(selectFavorites);
@@ -36,28 +33,34 @@ export const PokeGrid = () => {
             const typeNames = selectedTypes.map(type => type.type);
             dispatch(getPokemonByTypes(typeNames));
         } else {
-            
-            dispatch(getPokemon(currentPage, currentLimit));
+            if (allPokemons.length === 0) {
+                dispatch(getPokemon(0, 21));
+            }
         }
-    }, [dispatch, currentPage, currentLimit, selectedTypes]);
+    }, [dispatch, selectedTypes, allPokemons.length]);
 
 
     const showFavorites = () => {
-        return allCachedPokemons.filter(pokemon => favorites.includes(pokemon.name));
+        return allPokemons.filter(pokemon => favorites.includes(pokemon.name));
     }
 
     const pokemonsToShow = showFavorite 
         ? showFavorites()
-        : pokemonList;
+        : allPokemons;
 
     if (loading) {
         return (
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-            <CircularProgress />
-            <Typography variant="h6" sx={{ ml: 2 }}>
-            Cargando Pokémon...
-            </Typography>
-        </Box>
+            <Grid container spacing={3} 
+                sx={{ 
+                    marginInline: { xs: '20px', sm: '40px', md: '80px' },
+                }}
+            >
+                {Array.from({ length: 12 }).map((_, index) => (
+                    <Grid size={{ xs: 12, md: 6, xl: 4 }} key={`skeleton-${index}`}>
+                        <SkeletonCard />
+                    </Grid>
+                ))}
+            </Grid>
         );
     }
 
@@ -84,30 +87,40 @@ export const PokeGrid = () => {
                         </Box>
                     </Grid>
                 ) : (
-                    pokemonsToShow.map((pokemon: { name: string; url: string }) => (
-                        <Grid size={{ xs: 12, md: 6, xl: 4 }} key={pokemon.name}>
-                            <PokeCard pokemon={pokemon} />
-                        </Grid>
-                    ))
+                    <>
+                        {pokemonsToShow.map((pokemon: { name: string; url: string }) => (
+                            <Grid size={{ xs: 12, md: 6, xl: 4 }} key={pokemon.name}>
+                                <PokeCard pokemon={pokemon} />
+                            </Grid>
+                        ))}
+                        
+                        {loadingMore && (
+                            Array.from({ length: 6 }).map((_, index) => (
+                                <Grid size={{ xs: 12, md: 6, xl: 4 }} key={`skeleton-loading-more-${index}`}>
+                                    <SkeletonCard />
+                                </Grid>
+                            ))
+                        )}
+                    </>
                 )}
 
             <Box 
                 sx={{ 
                     display: 'flex', 
                     flexDirection: 'row', 
-                    justifyContent: 'space-between' 
+                    justifyContent: 'center' 
                     }} 
                 height= "80px"
                 width={"100%"}>
                 
 
-                <PreviousPageButton 
+                {/* <PreviousPageButton 
                     hasSelectedTypes={selectedTypes.length > 0}
                     visible={selectedTypes.length === 0}
-                />
+                /> */}
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent:'center' }}>
-                    <Typography 
+                    {/* <Typography 
                         variant="body1" 
                         sx={{ 
                             mx: 2,
@@ -122,14 +135,16 @@ export const PokeGrid = () => {
                     }}
                     >
                         {showFavorite ? 'Favs' : selectedTypes.length > 0 ? 'Filtrado' : currentPage + 1}
-                    </Typography>
-                    <LoadMoreButton />
+                    </Typography> */}
+                    {selectedTypes.length === 0 && !showFavorite && (
+                        <LoadMoreButton />
+                    )}
                 </Box>
 
-                <NextPageButton 
+                {/* <NextPageButton 
                     hasSelectedTypes={selectedTypes.length > 0}
                     visible={ selectedTypes.length === 0}
-                />
+                /> */}
 
             </Box>
         </Grid>

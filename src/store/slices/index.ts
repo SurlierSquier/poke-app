@@ -1,3 +1,4 @@
-export * from './pokemonSlice';
 export * from './getPokemon';
-export * from './getPokemonByType'
+export * from './getPokemonByType';
+export * from './loadMorePokemon';
+export * from './pokemonSlice';

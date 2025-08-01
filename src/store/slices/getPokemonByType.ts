@@ -1,7 +1,7 @@
 
-import { pokemonApi } from "../../api";
-import { setPokemon, startLoadingPokemon } from "./pokemonSlice";
 import type { Dispatch } from "@reduxjs/toolkit";
+import { pokemonApi } from "../../api";
+import { setPokemonByType, startLoadingPokemon } from "./pokemonSlice";
 
 export const getPokemonByType = (type: string) => {
 
@@ -14,7 +14,7 @@ export const getPokemonByType = (type: string) => {
                 name: p.pokemon.name,
                 url: p.pokemon.url
             }));
-            dispatch(setPokemon({ results: pokemonList, count: pokemonList.length }));
+            dispatch(setPokemonByType({ results: pokemonList, count: pokemonList.length }));
         } catch (error) {
             console.error('Error fetching pokemon by type:', error);
         }
@@ -45,7 +45,7 @@ export const getPokemonByTypes = (types: string[]) => {
             });
             
             const uniquePokemonList = Array.from(allPokemon.values());
-            dispatch(setPokemon({ results: uniquePokemonList, count: uniquePokemonList.length }));
+            dispatch(setPokemonByType({ results: uniquePokemonList, count: uniquePokemonList.length }));
         } catch (error) {
             console.error('Error fetching pokemon by types:', error);
         }

@@ -1,15 +1,14 @@
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import ListItemText from '@mui/material/ListItemText';
-import Select from '@mui/material/Select';
-import Checkbox from '@mui/material/Checkbox';
-import { pokemonTypes } from '../data/type-color';
-import { type SelectChangeEvent } from '@mui/material/Select';
-import { useDispatch, useSelector } from 'react-redux';
-import { setPokemonTypes, selectPokemonTypes } from '../store/slices/pokemonSlice';
 import { useScrollTrigger } from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import ListItemText from '@mui/material/ListItemText';
+import MenuItem from '@mui/material/MenuItem';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import Select, { type SelectChangeEvent } from '@mui/material/Select';
+import { useDispatch, useSelector } from 'react-redux';
+import { pokemonTypes } from '../data/type-color';
+import { selectPokemonTypes, setPokemonTypes } from '../store/slices/pokemonSlice';
 
 export const TypeFilter = () => {
   const trigger = useScrollTrigger();
@@ -31,12 +30,17 @@ export const TypeFilter = () => {
   const dispatch = useDispatch();
   const selectedTypes = useSelector(selectPokemonTypes);
 
-  const handleChange = (event: SelectChangeEvent<typeof pokemonTypes>) => {
+  const handleChange = (event: SelectChangeEvent<string[]>) => {
     const {
       target: { value },
     } = event;
-    const uniqueTypes = Array.isArray(value) ? value : [];
-    dispatch(setPokemonTypes(uniqueTypes));
+    
+    const selectedTypeNames = Array.isArray(value) ? value : [];
+    const selectedTypeObjects = selectedTypeNames.map(typeName => 
+      pokemonTypes.find(pt => pt.type === typeName)
+    ).filter((type): type is typeof pokemonTypes[number] => type !== undefined);
+    
+    dispatch(setPokemonTypes(selectedTypeObjects));
   };
 
 
@@ -56,11 +60,11 @@ export const TypeFilter = () => {
           labelId="demo-multiple-checkbox-label"
           id="demo-multiple-checkbox"
           multiple
-          value={selectedTypes}
+          value={selectedTypes.map(type => type.type)}
           onChange={handleChange}
           //inputProps={{MenuProps: {disableScrollLock: true}}}
           input={<OutlinedInput label="Tipos" />}
-          renderValue={(selected) => selected.map((x) => x.type).join(', ')}
+          renderValue={(selected) => selected.join(', ')}
           MenuProps={MenuProps}
         >
           {pokemonTypes.map((pokemonType) => (

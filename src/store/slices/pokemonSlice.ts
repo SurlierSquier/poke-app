@@ -1,4 +1,4 @@
-import { createSlice, createSelector, type PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { pokemonTypes } from '../../data/type-color';
 import { type RootState } from '../store';
 
@@ -13,11 +13,13 @@ interface PokemonState {
     pokemonCache: Record<number, PokemonData[]>; 
     currentPage: number;
     loading: boolean;
+    loadingMore: boolean;
     totalCount: number;
     favorites: string[];
     showFavorite: boolean;
     selectedTypes: PokemonType[];
     currentLimit: number;
+    allPokemons: PokemonData[];
 }
 
 export const pokemonSlice = createSlice({
@@ -26,16 +28,21 @@ export const pokemonSlice = createSlice({
         pokemonCache: {},
         currentPage: 0,
         loading: false,
+        loadingMore: false,
         totalCount: 0,
         favorites: [],
         selectedTypes: [],
         showFavorite: false,
         currentLimit: 21,
+        allPokemons: [],
     } as PokemonState,
     
     reducers: {
         startLoadingPokemon: (state) => {
             state.loading = true;
+        },
+        startLoadingMore: (state) => {
+            state.loadingMore = true;
         },
         setPokemon: (state, action: PayloadAction<{ results: PokemonData[]; count: number }>) => {
             const { results, count } = action.payload;
@@ -43,6 +50,29 @@ export const pokemonSlice = createSlice({
             state.pokemonCache[state.currentPage] = results || [];
             state.totalCount = count || 0;
             state.loading = false;
+            state.allPokemons = [...state.allPokemons, ...results];
+            
+        },
+        setPokemonByType: (state, action: PayloadAction<{ results: PokemonData[]; count: number }>) => {
+            const { results, count } = action.payload;
+
+            state.pokemonCache = {}; 
+            state.currentPage = 0;
+            state.pokemonCache[0] = results || [];
+            state.totalCount = count || 0;
+            state.loading = false;
+            state.allPokemons = results || [];
+        },
+        appendPokemons: (state, action: PayloadAction<{ results: PokemonData[]; count: number }>) => {
+            const { results, count } = action.payload;
+            
+            if (results && results.length > 0) {
+                state.allPokemons = [...state.allPokemons, ...results];
+                state.currentPage += 1;
+                state.pokemonCache[state.currentPage] = results;
+                state.totalCount = count || state.totalCount;
+            }
+            state.loadingMore = false;
         },
         setPage: (state, action: PayloadAction<number>) => {
             state.currentPage = action.payload;
@@ -68,23 +98,28 @@ export const pokemonSlice = createSlice({
             state.selectedTypes = action.payload;
             state.pokemonCache = {};
             state.currentPage = 0;
+            state.allPokemons = [];
         },
         clearCache: (state) => {
             state.pokemonCache = {};
             state.currentPage = 0;
+            state.allPokemons = [];
         },
         toggleFavoriteButton: (state) => {
             state.showFavorite = !state.showFavorite;
         },
         loadMorePokemons: (state) => {
-            state.currentLimit += 10;
+            state.currentLimit += 21;
         }
     }
 });
 
 export const { 
     startLoadingPokemon, 
+    startLoadingMore,
     setPokemon, 
+    setPokemonByType,
+    appendPokemons,
     setPage, 
     incrementPage, 
     decrementPage, 
@@ -123,6 +158,14 @@ export const selectCurrentPage = (state: { pokemon: PokemonState }) => {
 
 export const selectLoading = (state: { pokemon: PokemonState }) => {
     return state.pokemon.loading;
+};
+
+export const selectLoadingMore = (state: { pokemon: PokemonState }) => {
+    return state.pokemon.loadingMore;
+};
+
+export const selectAllPokemons = (state: { pokemon: PokemonState }) => {
+    return state.pokemon.allPokemons;
 };
 
 export const selectIsFavorite = (state: { pokemon: PokemonState }, pokemonName: string) => {
