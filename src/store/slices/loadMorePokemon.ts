@@ -7,7 +7,7 @@ export const loadMorePokemon = () => {
     return async (dispatch: Dispatch, getState: () => RootState) => {
         const state = getState();
         const currentPage = state.pokemon.currentPage;
-        const currentLimit = 21; // Carga 21 pokémon más por página
+        const currentLimit = 21; 
         
         dispatch(startLoadingMore());
 
@@ -17,7 +17,6 @@ export const loadMorePokemon = () => {
             dispatch(appendPokemons(data));
         } catch (error) {
             console.error('Error loading more pokemon:', error);
-            // Reset loading state on error
             dispatch(appendPokemons({ results: [], count: 0 }));
         }
     }
