@@ -20,7 +20,6 @@ export const AllButton = () => {
                 ...(showFavorite && {
                     '&:hover': {
                         backgroundColor: showFavorite ? 'lightgreen' : 'lightgray',
-                        color: 'black',
                     }
                 }),
               }}
