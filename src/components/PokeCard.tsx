@@ -11,6 +11,7 @@ import { selectIsFavorite, toggleFavorite } from '../store';
 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { SkeletonCard } from './SkeletonCard';
 
 interface PokemonData {
     name: string;
@@ -34,13 +35,6 @@ interface PokemonDetails {
     types: Array<{
         type: {
             name: string;
-            sprites?: {
-                "generation-vii"?: {
-                    "legends-arceus"?: {
-                        "name_icon"?: string;
-                    };
-                };
-            };
         };
     }>;
     height: number;
@@ -86,9 +80,7 @@ export const PokeCard = ({ pokemon }: PokeCardProps) => {
 
     if (loading) {
         return (
-            <Card sx={{ height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Typography>Loading...</Typography>
-            </Card>
+            <SkeletonCard />
         );
     }
 

@@ -23,6 +23,7 @@ export const SkeletonCard = () => {
             width={32} 
             height={32} 
             sx={{ position: 'absolute', top: 100, left: 8 }}
+            animation="wave"
           />
           
           <Skeleton
@@ -33,6 +34,7 @@ export const SkeletonCard = () => {
               mx: 'auto',
               borderRadius: '8px'
             }}
+            animation="wave"
           />
           
           <Skeleton 
@@ -40,6 +42,7 @@ export const SkeletonCard = () => {
             width={32} 
             height={32} 
             sx={{ position: 'absolute', top: 100, right: 8 }}
+            animation="wave"
           />
 
           <CardContent sx={{ textAlign: 'center', pt: 1, flex: 1}}>
@@ -50,8 +53,8 @@ export const SkeletonCard = () => {
               </Box>
               
               <Box sx={{ mt: 1}}>
-                <Skeleton variant="text" width="70%" height={16} sx={{ mx: 'auto', mb: 0.5 }} />
-                <Skeleton variant="text" width="70%" height={16} sx={{ mx: 'auto' }} />
+                <Skeleton variant="text" width="70%" height={16} sx={{ mx: 'auto', mb: 0.5 }} animation="wave" />
+                <Skeleton variant="text" width="70%" height={16} sx={{ mx: 'auto' }} animation="wave" />
               </Box>
             </Box>
           </CardContent>
@@ -66,6 +69,7 @@ export const SkeletonCard = () => {
               right: 16,
               zIndex: 1,
             }}
+            animation="wave"
           />
         </Card>
     )
